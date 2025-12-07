@@ -19,63 +19,40 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
-    - name: Setup Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
         
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.0' # Use stable version
+        flutter-version: '3.19.0'
         channel: 'stable'
         
-    - name: Verify Flutter installation
-      run: flutter doctor -v
-      
     - name: Get Flutter dependencies
       run: flutter pub get
       
-    - name: Clean Flutter build
-      run: flutter clean
-      
-    - name: Setup Xcode
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: latest-stable
-        
-    - name: Show Xcode version
-      run: xcodebuild -version
-      
-    - name: Install CocoaPods
+    - name: Build iOS
       run: |
         cd ios
         pod install
-        
-    - name: Build iOS (without codesigning)
-      run: |
+        cd ..
         flutter build ios --release --no-codesign
         
-    - name: Create IPA Archive
+    - name: Create IPA
       run: |
         cd ios
         xcodebuild -workspace Runner.xcworkspace \
           -scheme Runner \
           -configuration Release \
+          -destination generic/platform=iOS \
           -archivePath build/Runner.xcarchive \
-          archive \
-          -allowProvisioningUpdates
-        
+          archive
+          
     - name: Export IPA
       run: |
         cd ios
         xcodebuild -exportArchive \
           -archivePath build/Runner.xcarchive \
-          -exportOptionsPlist ExportOptions.plist \
           -exportPath build/output \
-          -allowProvisioningUpdates
+          -exportOptionsPlist ExportOptions.plist
           
     - name: Upload IPA Artifact
       uses: actions/upload-artifact@v3
@@ -83,12 +60,3 @@ jobs:
         name: ios-ipa
         path: ios/build/output/*.ipa
         retention-days: 30
-        
-    - name: Upload Build Logs
-      uses: actions/upload-artifact@v3
-      with:
-        name: build-logs
-        path: |
-          ios/build/
-          build/
-        retention-days: 7
