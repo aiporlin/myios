@@ -65,7 +65,8 @@ jobs:
           -scheme Runner \
           -configuration Release \
           -archivePath build/Runner.xcarchive \
-          archive
+          archive \
+          -allowProvisioningUpdates
         
     - name: Export IPA
       run: |
@@ -73,7 +74,8 @@ jobs:
         xcodebuild -exportArchive \
           -archivePath build/Runner.xcarchive \
           -exportOptionsPlist ExportOptions.plist \
-          -exportPath build/output
+          -exportPath build/output \
+          -allowProvisioningUpdates
           
     - name: Upload IPA Artifact
       uses: actions/upload-artifact@v3
