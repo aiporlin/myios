@@ -33,7 +33,7 @@ jobs:
       run: flutter build ipa --no-codesign
         
     - name: Upload IPA Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ios-ipa
         path: build/ios/ipa/*.ipa
