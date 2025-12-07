@@ -1,10 +1,16 @@
-name: Build iOS
+name: Build iOS IPA
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      build_number:
+        description: 'Build number'
+        required: false
+        default: '1'
 
 jobs:
   build-ios:
@@ -23,16 +29,12 @@ jobs:
     - name: Get Flutter dependencies
       run: flutter pub get
       
-    - name: Build iOS
-      run: |
-        cd ios
-        pod install
-        cd ..
-        flutter build ios --release --no-codesign
+    - name: Build iOS IPA
+      run: flutter build ipa --no-codesign
         
-    - name: Upload iOS Build
+    - name: Upload IPA Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ios-build
-        path: build/ios/iphoneos/Runner.app
+        name: ios-ipa
+        path: build/ios/ipa/*.ipa
         retention-days: 30
